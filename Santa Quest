@@ -1,0 +1,94 @@
+-- Load Orion Library
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+
+-- Variables
+local selectedPart = nil
+
+-- Function to collect Santa Quest parts
+local function collectPart(partNumber)
+    local args = {
+        [1] = "Collect",
+        [2] = tostring(partNumber)
+    }
+
+    pcall(function()
+        game:GetService("ReplicatedStorage").Events.RemoteEvents.SantaQuestEvent:FireServer(unpack(args))
+    end)
+
+    OrionLib:MakeNotification({
+        Name = "Success",
+        Content = "Successfully collected Part " .. tostring(partNumber) .. "!",
+        Image = "rbxassetid://4483345998",
+        Time = 5
+    })
+end
+
+-- Function to claim Santa Quest reward
+local function claimSantaQuest()
+    local args = {
+        [1] = "Claim"
+    }
+
+    pcall(function()
+        game:GetService("ReplicatedStorage").Events.RemoteEvents.SantaQuestEvent:FireServer(unpack(args))
+    end)
+
+    OrionLib:MakeNotification({
+        Name = "Claim Success",
+        Content = "Santa Quest reward claimed!",
+        Image = "rbxassetid://4483345998",
+        Time = 5
+    })
+end
+
+-- GUI Setup
+local Window = OrionLib:MakeWindow({Name = "Clicking Universe", HidePremium = false, SaveConfig = true, ConfigFolder = "ClickingUniverse"})
+
+local QuestTab = Window:MakeTab({
+    Name = "Quest",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local SantaSection = QuestTab:AddSection({Name = "Santa Quest"})
+
+SantaSection:AddDropdown({
+    Name = "Select Part",
+    Default = "1",
+    Options = {"1", "2", "3", "4"},
+    Callback = function(value)
+        selectedPart = value
+        OrionLib:MakeNotification({
+            Name = "Part Selected",
+            Content = "You selected Part " .. value .. ".",
+            Image = "rbxassetid://4483345998",
+            Time = 5
+        })
+    end
+})
+
+SantaSection:AddButton({
+    Name = "Collect Part",
+    Callback = function()
+        if selectedPart then
+            collectPart(selectedPart)
+        else
+            OrionLib:MakeNotification({
+                Name = "Error",
+                Content = "Please select a part first!",
+                Image = "rbxassetid://4483345998",
+                Time = 5
+            })
+        end
+    end
+})
+
+SantaSection:AddButton({
+    Name = "Claim",
+    Callback = function()
+        claimSantaQuest()
+    end
+})
+
+-- Initialize GUI
+OrionLib:Init()
